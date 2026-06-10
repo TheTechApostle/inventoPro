@@ -1,4 +1,4 @@
-# Inventra — Multi-Tenant Inventory & Business Operations Platform
+# InventoPro — Multi-Tenant Inventory & Business Operations Platform
 
 Production-grade Django/DRF platform for inventory, sales, purchases, finance, and analytics.
 Supports single businesses, multi-branch enterprises, and SaaS white-label deployments.
@@ -17,13 +17,16 @@ pip install -r requirements/development.txt
 
 # 2. Environment
 cp .env.example .env
+or
+copy .env.example .env
+(for windows)
 # Edit .env with your DB, Redis credentials
 
 # 3. Create logs directory
 mkdir -p logs
 
 # 4. Database
-createdb inventra_db
+Database already configured in neon
 python manage.py migrate
 
 # 5. Run
