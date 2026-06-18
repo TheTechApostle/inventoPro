@@ -98,11 +98,7 @@ class ChangePasswordView(generics.GenericAPIView):
 
 
 class RoleViewSet(TenantQuerysetMixin, viewsets.ModelViewSet):
-    """
-    CRUD for tenant roles. GET/POST/PATCH/DELETE /api/v1/auth/roles/
-    GET /api/v1/auth/roles/permissions_catalog/ — list of all permission codes,
-    grouped, for building a role-editor checklist UI.
-    """
+    """CRUD for tenant roles. GET/POST/PATCH/DELETE /api/v1/auth/roles/"""
     serializer_class = RoleSerializer
     permission_classes = [IsAuthenticated, TenantPermission, CanManageUsers]
     queryset = Role.objects.all()
@@ -113,31 +109,11 @@ class RoleViewSet(TenantQuerysetMixin, viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(tenant=self.request.tenant)
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        # Owner role's name is structural — used in onboarding, ownership
-        # transfer, etc. Permissions and display_name can still be edited.
-        if instance.is_system_role and "name" in request.data and request.data["name"] != instance.name:
-            return Response(
-                {"success": False, "error": {"message": "System role names cannot be changed."}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        partial = kwargs.pop("partial", False)
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"success": True, "data": serializer.data})
-
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.is_system_role:
             return Response(
                 {"success": False, "error": {"message": "System roles cannot be deleted."}},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if instance.memberships.filter(is_active=True).exists():
-            return Response(
-                {"success": False, "error": {"message": "Cannot delete a role assigned to active team members."}},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         instance.delete()
@@ -147,22 +123,6 @@ class RoleViewSet(TenantQuerysetMixin, viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         qs = self.get_queryset()
         return Response({"success": True, "data": RoleSerializer(qs, many=True).data})
-
-    @extend_schema(tags=["auth"])
-    @action(detail=False, methods=["get"], url_path="permissions_catalog")
-    def permissions_catalog(self, request):
-        """
-        GET /api/v1/auth/roles/permissions_catalog/
-        Returns every permission code Inventra recognises, grouped by module.
-        Use this to render a role-editor checklist in the frontend.
-        """
-        from core.permissions import PERMISSION_CATALOG
-        groups = {}
-        for perm in PERMISSION_CATALOG:
-            groups.setdefault(perm["group"], []).append(
-                {"code": perm["code"], "label": perm["label"]}
-            )
-        return Response({"success": True, "data": groups})
 
 
 class TeamViewSet(viewsets.ViewSet):
@@ -212,12 +172,6 @@ class TeamViewSet(viewsets.ViewSet):
         ).first()
         if not membership:
             return Response({"success": False, "error": {"message": "Member not found."}}, status=404)
-
-        if membership.user == request.tenant.owner:
-            return Response(
-                {"success": False, "error": {"message": "The tenant owner's role cannot be changed. Transfer ownership first."}},
-                status=400,
-            )
 
         role_id = request.data.get("role_id")
         role = Role.objects.filter(id=role_id, tenant=request.tenant).first()

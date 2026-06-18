@@ -111,33 +111,6 @@ class CanManageSettings(BaseModulePermission):
 
 # ── Default permission sets per role ────────────────────────────────────────
 
-PERMISSION_CATALOG = [
-    {"code": "inventory.view", "label": "View Inventory", "group": "Inventory"},
-    {"code": "inventory.create", "label": "Manage Inventory", "group": "Inventory"},
-    {"code": "inventory.adjust", "label": "Adjust Stock", "group": "Inventory"},
-    {"code": "products.view", "label": "View Products", "group": "Products"},
-    {"code": "products.create", "label": "Manage Products", "group": "Products"},
-    {"code": "products.delete", "label": "Delete Products", "group": "Products"},
-    {"code": "sales.view", "label": "View Sales", "group": "Sales"},
-    {"code": "sales.create", "label": "Create Sales Orders", "group": "Sales"},
-    {"code": "sales.void", "label": "Cancel / Void Sales", "group": "Sales"},
-    {"code": "purchases.view", "label": "View Purchases", "group": "Purchases"},
-    {"code": "purchases.create", "label": "Create Purchase Orders", "group": "Purchases"},
-    {"code": "purchases.approve", "label": "Approve Purchase Orders", "group": "Purchases"},
-    {"code": "finance.view", "label": "View Finance", "group": "Finance"},
-    {"code": "finance.create", "label": "Manage Expenses", "group": "Finance"},
-    {"code": "analytics.view", "label": "View Analytics", "group": "Analytics"},
-    {"code": "users.manage", "label": "Manage Team & Roles", "group": "Administration"},
-    {"code": "settings.manage", "label": "Manage Tenant Settings", "group": "Administration"},
-]
-
-VALID_PERMISSION_CODES = {p["code"] for p in PERMISSION_CATALOG}
-
-# Permissions the owner role must always retain — prevents an owner
-# from editing their own role into a state where the business is unmanageable.
-OWNER_REQUIRED_PERMISSIONS = {"users.manage", "settings.manage"}
-
-
 ROLE_PERMISSIONS = {
     "owner": [
         "inventory.view", "inventory.create", "inventory.adjust",

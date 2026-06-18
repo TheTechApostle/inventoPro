@@ -105,35 +105,6 @@ class RoleSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "is_system_role", "created_at"]
 
-    def validate_name(self, value):
-        return value.strip().lower().replace(" ", "_")
-
-    def validate_permissions(self, value):
-        from core.permissions import VALID_PERMISSION_CODES
-        if not isinstance(value, list):
-            raise serializers.ValidationError("Permissions must be a list of codes.")
-        invalid = set(value) - VALID_PERMISSION_CODES
-        if invalid:
-            raise serializers.ValidationError(
-                f"Unknown permission code(s): {', '.join(sorted(invalid))}"
-            )
-        return list(set(value))  # de-duplicate
-
-    def validate(self, data):
-        # Protect the owner role from losing the permissions it needs
-        # to keep managing the business (only relevant on update).
-        instance = getattr(self, "instance", None)
-        if instance and instance.name == "owner" and "permissions" in data:
-            from core.permissions import OWNER_REQUIRED_PERMISSIONS
-            missing = OWNER_REQUIRED_PERMISSIONS - set(data["permissions"])
-            if missing:
-                raise serializers.ValidationError({
-                    "permissions": (
-                        f"The owner role must always retain: {', '.join(sorted(missing))}"
-                    )
-                })
-        return data
-
 
 class TenantMembershipSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
