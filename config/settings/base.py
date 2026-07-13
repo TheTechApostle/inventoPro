@@ -307,18 +307,11 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
-        "file": {
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": BASE_DIR / "logs" / "inventra.log",
-            "maxBytes": 1024 * 1024 * 10,
-            "backupCount": 5,
-            "formatter": "verbose",
-        },
     },
     "root": {"handlers": ["console"], "level": "INFO"},
     "loggers": {
         "django": {"handlers": ["console"], "level": "WARNING", "propagate": False},
-        "inventra": {"handlers": ["console", "file"], "level": "DEBUG", "propagate": False},
+        "inventra": {"handlers": ["console"], "level": "DEBUG", "propagate": False},
         "celery": {"handlers": ["console"], "level": "INFO", "propagate": False},
     },
 }
