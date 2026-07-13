@@ -1,7 +1,7 @@
 from .base import *  # noqa
 
 DEBUG = True
-ALLOWED_HOSTS = ["https://invento-pro-frontend.vercel.app"]
+ALLOWED_HOSTS = ["https://invento-pro-frontend.vercel.app", "localhost:5173"]
 
 # Disable throttling in development
 REST_FRAMEWORK["DEFAULT_THROTTLE_CLASSES"] = []  # noqa
